@@ -1,0 +1,133 @@
+generator client {
+  provider = "prisma-client-js"
+}
+
+datasource db {
+  provider = "mysql"
+  url      = env("DATABASE_URL")
+}
+
+model Product {
+  title           String
+  price           Float
+  description     String @db.LongText
+  words           String @db.LongText
+  averageColor    String
+  prominentColors String
+
+  id        String            @id @default(uuid())
+  createdAt DateTime          @default(now())
+  updatedAt DateTime          @updatedAt
+  category  ProductCategory[]
+  images    ProductImage[]
+  sizes     ProductSize[]
+  orders    ProductOrder[]
+  reviews   Review[]
+}
+
+model Order {
+  id             String         @id @default(uuid())
+  products       ProductOrder[]
+  email          String
+  phone          String
+  firstName      String
+  lastName       String
+  country        String
+  address        String
+  city           String
+  province       String
+  payment        PaymentType    @default(CashOnDelivery)
+  billingAddress String?        @db.LongText
+  subtotal       Float
+  total          Float
+  shippingFee    Float
+  status         OrderStatus    @default(Pending)
+  createdAt      DateTime       @default(now())
+  updatedAt      DateTime       @updatedAt
+}
+
+model ProductOrder {
+  quantity Int    @default(1)
+  title    String
+  price    Float
+
+  id        String      @id @default(uuid())
+  createdAt DateTime    @default(now())
+  order     Order       @relation(fields: [orderId], references: [id], onDelete: Cascade)
+  orderId   String
+  product   Product     @relation(fields: [productId], references: [id], onDelete: Cascade)
+  productId String
+  size      ProductSize @relation(fields: [sizeId], references: [id], onDelete: Cascade)
+  sizeId    String
+}
+
+model ProductCategory {
+  name        String
+  group       Int
+  displayName String
+
+  id        String    @id @default(uuid())
+  createdAt DateTime  @default(now())
+  updatedAt DateTime  @updatedAt
+  product   Product[]
+}
+
+model ProductImage {
+  url       String
+  productId String
+
+  id        String   @id @default(uuid())
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+  product   Product  @relation(fields: [productId], references: [id], onDelete: Cascade)
+}
+
+model ProductSize {
+  name      String
+  chest     Int
+  length    Int
+  productId String
+
+  id        String         @id @default(uuid())
+  createdAt DateTime       @default(now())
+  updatedAt DateTime       @updatedAt
+  product   Product        @relation(fields: [productId], references: [id], onDelete: Cascade)
+  orders    ProductOrder[]
+}
+
+model Review {
+  name      String
+  message   String
+  rating    Int
+  image     ReviewImage?
+  ip        String?
+  productId String
+
+  id        String   @id @default(uuid())
+  product   Product  @relation(fields: [productId], references: [id], onDelete: Cascade)
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+}
+
+model ReviewImage {
+  fileName String
+  fileType String
+  fileSize Int
+  reviewId String @unique
+
+  id        String   @id @default(uuid())
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+  review    Review   @relation(fields: [reviewId], references: [id], onDelete: Cascade)
+}
+
+enum PaymentType {
+  CashOnDelivery
+  Card
+}
+
+enum OrderStatus {
+  Pending
+  Shipping
+  Fulfilled
+}

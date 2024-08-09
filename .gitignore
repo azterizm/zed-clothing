@@ -1,0 +1,12 @@
+node_modules
+
+/.cache
+/build
+.env
+/uploads
+backup.sql
+.env.production
+.env.prod
+.env.dev
+.env.development
+/scrap

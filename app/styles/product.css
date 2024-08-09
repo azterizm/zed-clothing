@@ -1,0 +1,14 @@
+@keyframes bg-blob-anim {
+  from {
+    filter: blur(4rem);
+    transform: scale(2.25);
+  }
+  to {
+    filter: blur(5rem);
+    transform: scale(1.75);
+  }
+}
+
+#bg-blob {
+  animation: bg-blob-anim 3s infinite linear alternate;
+}
